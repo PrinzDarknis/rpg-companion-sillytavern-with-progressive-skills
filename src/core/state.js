@@ -3,6 +3,8 @@
  * Centralizes all extension state variables
  */
 
+import { createDefaultConfig as createProgressiveSkillsConfig } from '../systems/progressiveSkills/model/index.js';
+
 // Type imports
 /** @typedef {import('../types/inventory.js').InventoryV2} InventoryV2 */
 
@@ -186,6 +188,8 @@ export let extensionSettings = {
                 recentEvents: { enabled: true, persistInHistory: false }
             }
         },
+        // Progressive Skills definitions + start values (disabled, no skills); per-chat state lives in the messages
+        progressiveSkills: createProgressiveSkillsConfig(),
         presentCharacters: {
             // Fixed fields (always shown)
             showEmoji: true,
