@@ -463,5 +463,15 @@
     "inventory.stored.removeLocationConfirm": "Remove \"{location}\"? This will delete all items stored there.",
     "userStats.clickToEdit": "Click to edit",
     "quests.main.addQuestTitle": "Add main quests",
-    "quests.optional.addQuestTitle": "Add optional quest"
+    "quests.optional.addQuestTitle": "Add optional quest",
+    "progressiveSkills.title": "Progressive Skills",
+    "progressiveSkills.empty": "No skills configured yet.",
+    "progressiveSkills.description": "Description",
+    "progressiveSkills.status.xp": "XP progression",
+    "progressiveSkills.status.direct": "Direct growth",
+    "progressiveSkills.status.maxed": "Maxed",
+    "progressiveSkills.xp": "XP",
+    "progressiveSkills.remaining": "{remaining} XP to next level",
+    "progressiveSkills.thresholdInvalid": "Threshold invalid — XP keeps accumulating, no level-ups until fixed",
+    "progressiveSkills.freePoints": "Free skill points"
 }

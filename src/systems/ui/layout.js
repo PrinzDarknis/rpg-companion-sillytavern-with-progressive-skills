@@ -14,11 +14,13 @@ import {
     $musicPlayerContainer,
     setInventoryContainer,
     setQuestsContainer,
+    setProgressiveSkillsContainer,
     lastGeneratedData,
     committedTrackerData
 } from '../../core/state.js';
 import { i18n } from '../../core/i18n.js';
 import { setupMobileTabs, removeMobileTabs } from './mobile.js';
+import { renderProgressiveSkills } from '../rendering/progressiveSkills.js';
 import { setupDesktopTabs, removeDesktopTabs, updateStripWidgets } from './desktop.js';
 
 /**
@@ -277,6 +279,7 @@ export function updateSectionVisibility() {
     // Refresh container references first (in case they were detached during tab operations)
     setInventoryContainer($('#rpg-inventory'));
     setQuestsContainer($('#rpg-quests'));
+    setProgressiveSkillsContainer($('#rpg-progressive-skills'));
 
     // Show/hide sections based on settings
     // Use explicit .show()/.hide() instead of .toggle() to ensure proper state on reload
@@ -316,6 +319,9 @@ export function updateSectionVisibility() {
     } else {
         $('#rpg-quests').hide();
     }
+
+    // Progressive Skills: visible only while the feature is active; re-rendered so it is current when shown
+    renderProgressiveSkills();
 
     if ($musicPlayerContainer) {
         if (extensionSettings.enableSpotifyMusic) {

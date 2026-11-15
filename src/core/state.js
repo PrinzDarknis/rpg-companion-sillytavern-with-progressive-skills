@@ -476,6 +476,7 @@ export let $thoughtsContainer = null;
 export let $inventoryContainer = null;
 export let $questsContainer = null;
 export let $musicPlayerContainer = null;
+export let $progressiveSkillsContainer = null;
 
 /**
  * State setters - provide controlled mutation of state variables
@@ -567,4 +568,8 @@ export function setQuestsContainer($element) {
 
 export function setMusicPlayerContainer($element) {
     $musicPlayerContainer = $element;
+}
+
+export function setProgressiveSkillsContainer($element) {
+    $progressiveSkillsContainer = $element;
 }

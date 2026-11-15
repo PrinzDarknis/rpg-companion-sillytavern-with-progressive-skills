@@ -241,5 +241,15 @@
     "musicPlayer.noMusic": "ИИ будет предлагать музыку, когда это уместно для сцены",
     "errors.parsingError": "Ошибка парсинга RPG Companion Trackers! Модель вернула неправильный формат. Если проблема сохраняется, рассмотрите возможность смены модели для генераций.",
     "settings.recommendedModels.title": "Рекомендуемые модели",
-    "settings.recommendedModels.description": "Для правильной работы расширения **не рекомендуется использовать модели с базой обчучения ниже 20B, особенно если они старые.** Оно лучше всего работает с современными моделями, такими как Deepseek, Claude, GPT или Gemini."
+    "settings.recommendedModels.description": "Для правильной работы расширения **не рекомендуется использовать модели с базой обчучения ниже 20B, особенно если они старые.** Оно лучше всего работает с современными моделями, такими как Deepseek, Claude, GPT или Gemini.",
+    "progressiveSkills.title": "Развиваемые навыки",
+    "progressiveSkills.empty": "Навыки ещё не настроены.",
+    "progressiveSkills.description": "Описание",
+    "progressiveSkills.status.xp": "Развитие через опыт",
+    "progressiveSkills.status.direct": "Прямой рост",
+    "progressiveSkills.status.maxed": "Максимум",
+    "progressiveSkills.xp": "Опыт",
+    "progressiveSkills.remaining": "{remaining} опыта до следующего уровня",
+    "progressiveSkills.thresholdInvalid": "Порог недействителен — опыт продолжает накапливаться, повышения уровня не будет до исправления",
+    "progressiveSkills.freePoints": "Свободные очки навыков"
 }

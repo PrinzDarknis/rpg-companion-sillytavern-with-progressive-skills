@@ -28,6 +28,7 @@ import {
     importPresets
 } from '../../core/persistence.js';
 import { renderUserStats } from '../rendering/userStats.js';
+import { renderProgressiveSkills } from '../rendering/progressiveSkills.js';
 import { renderInfoBox } from '../rendering/infoBox.js';
 import { renderThoughts } from '../rendering/thoughts.js';
 import { updateFabWidgets } from './mobile.js';
@@ -353,6 +354,7 @@ function applyTrackerConfig() {
 
     // Re-render all trackers with new config
     renderUserStats();
+    renderProgressiveSkills();
     renderInfoBox();
     renderThoughts();
     updateFabWidgets(); // Update FAB widgets to reflect new config

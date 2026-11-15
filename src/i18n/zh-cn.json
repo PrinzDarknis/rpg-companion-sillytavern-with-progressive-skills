@@ -489,5 +489,15 @@
     "inventory.stored.removeLocationConfirm": "删除\"{location}\"？这将删除该位置存储的所有物品。",
     "userStats.clickToEdit": "点击编辑",
     "quests.main.addQuestTitle": "添加主线任务",
-    "quests.optional.addQuestTitle": "添加可选任务"
+    "quests.optional.addQuestTitle": "添加可选任务",
+    "progressiveSkills.title": "成长技能",
+    "progressiveSkills.empty": "尚未配置技能。",
+    "progressiveSkills.description": "描述",
+    "progressiveSkills.status.xp": "经验成长",
+    "progressiveSkills.status.direct": "直接成长",
+    "progressiveSkills.status.maxed": "已满级",
+    "progressiveSkills.xp": "经验",
+    "progressiveSkills.remaining": "距下一级还需 {remaining} 经验",
+    "progressiveSkills.thresholdInvalid": "阈值无效——经验会继续累积，修正前不会升级",
+    "progressiveSkills.freePoints": "自由技能点"
 }

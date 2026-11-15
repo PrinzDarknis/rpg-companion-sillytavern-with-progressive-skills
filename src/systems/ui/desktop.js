@@ -344,6 +344,11 @@ export function setupDesktopTabs() {
         $statusTab.append($userStats.detach());
         if (extensionSettings.showUserStats) $userStats.show();
     }
+    // Progressive Skills: after User Stats; keeps its own visibility (feature active or not)
+    const $progressiveSkills = $('#rpg-progressive-skills');
+    if ($progressiveSkills.length > 0) {
+        $statusTab.append($progressiveSkills.detach());
+    }
     if ($infoBox.length > 0) {
         $statusTab.append($infoBox.detach());
         // Only show if enabled and has data
@@ -407,6 +412,7 @@ export function setupDesktopTabs() {
 export function removeDesktopTabs() {
     // Get sections from tabs before removing
     const $userStats = $('#rpg-user-stats').detach();
+    const $progressiveSkills = $('#rpg-progressive-skills').detach();
     const $infoBox = $('#rpg-info-box').detach();
     const $thoughts = $('#rpg-thoughts').detach();
     const $inventory = $('#rpg-inventory').detach();
@@ -438,6 +444,9 @@ export function removeDesktopTabs() {
         $contentBox.append($inventory);
         $contentBox.append($quests);
     }
+
+    // Progressive Skills stays directly after User Stats
+    $userStats.after($progressiveSkills);
 
     // Show/hide sections based on settings (respect visibility settings)
     if (extensionSettings.showUserStats) $userStats.show();

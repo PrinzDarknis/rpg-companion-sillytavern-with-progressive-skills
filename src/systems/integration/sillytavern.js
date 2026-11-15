@@ -51,6 +51,7 @@ import { renderInfoBox } from '../rendering/infoBox.js';
 import { renderThoughts, updateChatThoughts } from '../rendering/thoughts.js';
 import { renderInventory } from '../rendering/inventory.js';
 import { renderQuests } from '../rendering/quests.js';
+import { renderProgressiveSkills } from '../rendering/progressiveSkills.js';
 import { renderMusicPlayer } from '../rendering/musicPlayer.js';
 
 // Utils
@@ -324,6 +325,7 @@ function restoreOrRepairLatestTrackerState() {
 
 function rerenderRpgState() {
     renderUserStats();
+    renderProgressiveSkills();
     renderInfoBox();
     renderThoughts();
     renderInventory();
@@ -767,6 +769,7 @@ export function onMessageSwiped(messageIndex) {
 
     // Re-render the panels
     renderUserStats();
+    renderProgressiveSkills();
     renderInfoBox();
     renderThoughts();
     renderInventory();

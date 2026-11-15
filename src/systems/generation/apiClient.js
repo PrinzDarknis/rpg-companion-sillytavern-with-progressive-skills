@@ -33,6 +33,7 @@ import { removeLocks } from './lockManager.js';
 import { renderThoughts } from '../rendering/thoughts.js';
 import { renderInventory } from '../rendering/inventory.js';
 import { renderQuests } from '../rendering/quests.js';
+import { renderProgressiveSkills } from '../rendering/progressiveSkills.js';
 import { renderMusicPlayer } from '../rendering/musicPlayer.js';
 import { i18n } from '../../core/i18n.js';
 import { generateAvatarsForCharacters } from '../features/avatarGenerator.js';
@@ -360,6 +361,7 @@ export async function updateRPGData(renderUserStats, renderInfoBox, renderThough
 
             // Render the updated data
             renderUserStats();
+            renderProgressiveSkills();
             renderInfoBox();
             renderThoughts();
             renderInventory();

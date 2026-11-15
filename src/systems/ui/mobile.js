@@ -658,6 +658,11 @@ export function setupMobileTabs() {
         $statsTab.append($userStats.detach());
         $userStats.show();
     }
+    // Progressive Skills: after User Stats; keeps its own visibility (feature active or not)
+    const $progressiveSkills = $('#rpg-progressive-skills');
+    if ($progressiveSkills.length > 0) {
+        $statsTab.append($progressiveSkills.detach());
+    }
 
     // Info tab: Info Box + Character Thoughts
     if ($infoBox.length > 0) {
@@ -720,6 +725,7 @@ export function setupMobileTabs() {
 export function removeMobileTabs() {
     // Get sections from tabs before removing
     const $userStats = $('#rpg-user-stats').detach();
+    const $progressiveSkills = $('#rpg-progressive-skills').detach();
     const $infoBox = $('#rpg-info-box').detach();
     const $thoughts = $('#rpg-thoughts').detach();
     const $inventory = $('#rpg-inventory').detach();
@@ -751,6 +757,9 @@ export function removeMobileTabs() {
         $contentBox.prepend($infoBox);
         $contentBox.prepend($userStats);
     }
+
+    // Progressive Skills stays directly after User Stats
+    $userStats.after($progressiveSkills);
 
     // Show/hide sections based on settings (respect visibility settings)
     if (extensionSettings.showUserStats) $userStats.show();

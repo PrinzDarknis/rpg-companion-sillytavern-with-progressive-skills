@@ -282,5 +282,15 @@
     "stats.con": "CON",
     "stats.int": "INT",
     "stats.wis": "VOL",
-    "stats.cha": "CHA"
+    "stats.cha": "CHA",
+    "progressiveSkills.title": "Compétences progressives",
+    "progressiveSkills.empty": "Aucune compétence configurée.",
+    "progressiveSkills.description": "Description",
+    "progressiveSkills.status.xp": "Progression par XP",
+    "progressiveSkills.status.direct": "Croissance directe",
+    "progressiveSkills.status.maxed": "Maximum",
+    "progressiveSkills.xp": "XP",
+    "progressiveSkills.remaining": "{remaining} XP avant le prochain niveau",
+    "progressiveSkills.thresholdInvalid": "Seuil invalide — l'XP continue de s'accumuler, aucune montée de niveau tant qu'il n'est pas corrigé",
+    "progressiveSkills.freePoints": "Points de compétence libres"
 }

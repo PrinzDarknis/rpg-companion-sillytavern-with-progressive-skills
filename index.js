@@ -40,6 +40,7 @@ import {
     setInventoryContainer,
     setQuestsContainer,
     setMusicPlayerContainer,
+    setProgressiveSkillsContainer,
     clearSessionAvatarPrompts
 } from './src/core/state.js';
 import { loadSettings, saveSettings, saveChatData, loadChatData, updateMessageSwipeData, commitTrackerDataFromPriorMessage } from './src/core/persistence.js';
@@ -70,6 +71,7 @@ import {
 } from './src/systems/rendering/thoughts.js';
 import { renderInventory } from './src/systems/rendering/inventory.js';
 import { renderQuests } from './src/systems/rendering/quests.js';
+import { renderProgressiveSkills } from './src/systems/rendering/progressiveSkills.js';
 import { renderMusicPlayer } from './src/systems/rendering/musicPlayer.js';
 import { toggleSnowflakes, initSnowflakes } from './src/systems/ui/snowflakes.js';
 import { toggleDynamicWeather, initWeatherEffects, updateWeatherEffect } from './src/systems/ui/weatherEffects.js';
@@ -315,6 +317,7 @@ async function initUI() {
     setInventoryContainer($('#rpg-inventory'));
     setQuestsContainer($('#rpg-quests'));
     setMusicPlayerContainer($('#rpg-music-player'));
+    setProgressiveSkillsContainer($('#rpg-progressive-skills'));
 
     // Re-apply translations to the entire body to catch all new elements from the template
     i18n.applyTranslations(document.body);
@@ -343,6 +346,7 @@ async function initUI() {
         extensionSettings.generationMode = String($(this).val());
         saveSettings();
         updateGenerationModeUI();
+        renderProgressiveSkills();
     });
 
     $('#rpg-toggle-user-stats').on('change', function() {
@@ -1268,6 +1272,7 @@ async function initUI() {
 
     // Render initial data if available
     renderUserStats();
+    renderProgressiveSkills();
     renderInfoBox();
     renderThoughts();
     renderInventory();

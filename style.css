@@ -11928,3 +11928,168 @@ body.documentstyle .rpg-inline-thoughts {
 .rpg-item-qty-edit:focus {
     outline: 1px solid var(--SmartThemeQuoteColor, #e94560);
 }
+
+/* ============================================
+   PROGRESSIVE SKILLS (read-only dashboard section)
+   ============================================ */
+/* Own content height (other sections share the rest); scrolls internally beyond half the tab height */
+.rpg-section.rpg-pskills-section {
+    flex: 0 1 auto;
+    max-height: 50%;
+}
+
+.rpg-pskills-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375em;
+    margin-top: 0.375em;
+    font-size: clamp(0.625rem, 0.6vw, 0.75rem);
+    color: var(--rpg-text);
+}
+
+.rpg-pskills-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5em;
+    flex-wrap: wrap;
+}
+
+.rpg-pskills-title {
+    margin: 0;
+    font-size: clamp(0.7rem, 0.7vw, 0.85rem);
+    font-weight: 700;
+    color: var(--rpg-highlight);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.rpg-pskills-free-points {
+    padding: 0.125em 0.5em;
+    border: 1px solid var(--rpg-border);
+    border-radius: 0.25em;
+    background: var(--rpg-accent);
+}
+
+.rpg-pskills-free-points-value {
+    font-weight: 700;
+    color: var(--rpg-highlight);
+}
+
+.rpg-pskills-empty {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.rpg-pskills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375em;
+}
+
+.rpg-pskills-skill {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+    padding: 0.375em 0.5em;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--rpg-border);
+    border-radius: 0.25em;
+}
+
+.rpg-pskills-row,
+.rpg-pskills-xp-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+    min-width: 0;
+}
+
+.rpg-pskills-name {
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.rpg-pskills-level {
+    color: var(--rpg-highlight);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.rpg-pskills-status {
+    flex-shrink: 0;
+    padding: 0 0.375em;
+    border-radius: 0.25em;
+    font-size: 0.85em;
+    border: 1px solid var(--rpg-border);
+    opacity: 0.85;
+}
+
+.rpg-pskills-status-maxed {
+    border-color: var(--rpg-highlight);
+    color: var(--rpg-highlight);
+    opacity: 1;
+}
+
+.rpg-pskills-value {
+    flex-shrink: 0;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.rpg-pskills-bar {
+    position: relative;
+    width: 100%;
+    border-radius: 0.375em;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box;
+}
+
+.rpg-pskills-bar-xp {
+    height: clamp(5px, 0.7vh, 7px);
+}
+
+.rpg-pskills-bar-fill {
+    height: 100%;
+    background: var(--rpg-highlight);
+    opacity: 0.7;
+}
+
+.rpg-pskills-xp {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125em;
+    font-size: 0.9em;
+}
+
+.rpg-pskills-xp-value {
+    flex: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.rpg-pskills-xp-remaining {
+    flex-shrink: 0;
+    opacity: 0.75;
+}
+
+.rpg-pskills-hint {
+    color: var(--rpg-highlight);
+    font-style: italic;
+}
+
+.rpg-pskills-description summary {
+    cursor: pointer;
+    opacity: 0.75;
+    font-size: 0.9em;
+}
+
+.rpg-pskills-description-text {
+    padding-top: 0.25em;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    opacity: 0.9;
+}
