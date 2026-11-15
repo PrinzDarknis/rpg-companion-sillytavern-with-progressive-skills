@@ -5,6 +5,9 @@
 /** Stored in config and state; bump together with a migration when the shape changes. */
 export const SCHEMA_VERSION = 1;
 
+/** Default for the largest accepted single delta (XP, direct increase, points) in one update; configurable. */
+export const DEFAULT_MAX_DELTA = 1000;
+
 /** Defaults for a newly created skill. */
 export const SKILL_DEFAULTS = Object.freeze({
     name: '',

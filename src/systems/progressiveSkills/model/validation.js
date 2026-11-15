@@ -19,6 +19,7 @@ export const VALIDATION_CODES = Object.freeze({
     GROWTH_CONDITION_EMPTY: 'GROWTH_CONDITION_EMPTY',
     FREE_POINTS_NEGATIVE: 'FREE_POINTS_NEGATIVE',
     FREE_POINTS_MAX_INVALID: 'FREE_POINTS_MAX_INVALID',
+    MAX_DELTA_INVALID: 'MAX_DELTA_INVALID',
 });
 
 const C = VALIDATION_CODES;
@@ -54,6 +55,9 @@ export function validateSkill(skill) {
  */
 export function validateConfig(config) {
     const errors = config.skills.flatMap(validateSkill);
+    if (!Number.isSafeInteger(config.maxDelta) || config.maxDelta <= 0) {
+        errors.push({ code: C.MAX_DELTA_INVALID, field: 'maxDelta' });
+    }
 
     const ids = new Set();
     const names = new Set();
