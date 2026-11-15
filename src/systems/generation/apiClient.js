@@ -38,6 +38,8 @@ import { i18n } from '../../core/i18n.js';
 import { generateAvatarsForCharacters } from '../features/avatarGenerator.js';
 import { setFabLoadingState, updateFabWidgets } from '../ui/mobile.js';
 import { updateStripWidgets } from '../ui/desktop.js';
+import { isPresentCharactersEnabled } from '../../utils/presentCharacters.js';
+import { processTrackerResponse as processProgressiveSkillsResponse } from '../progressiveSkills/integration/index.js';
 
 // Store the original preset name to restore after tracker generation
 let originalPresetName = null;
@@ -275,8 +277,13 @@ export async function updateRPGData(renderUserStats, renderInfoBox, renderThough
             // console.log('[RPG Companion] Raw AI response:', response);
             const parsedData = parseResponse(response);
 
+            // Progressive Skills: own parser + per-swipe store; returns null when inactive (never throws)
+            const progressiveSkillsResult = processProgressiveSkillsResponse(response, chat);
+
             // Check if parsing completely failed (no tracker data found)
-            if (parsedData.parsingFailed) {
+            // (not an error when Progressive Skills is the only requested section and it was found)
+            const onlyProgressiveSkillsRequested = !extensionSettings.showUserStats && !extensionSettings.showInfoBox && !isPresentCharactersEnabled();
+            if (parsedData.parsingFailed && !(onlyProgressiveSkillsRequested && progressiveSkillsResult?.found)) {
                 toastr.error(i18n.getTranslation('errors.parsingError') || 'RPG Companion Trackers parsing error! The model returned incorrect format. Consider switching generation model if this persists.', '', { timeOut: 5000 });
             }
 

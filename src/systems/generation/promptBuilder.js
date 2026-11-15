@@ -15,6 +15,7 @@ import {
 } from './jsonPromptHelpers.js';
 import { applyLocks } from './lockManager.js';
 import { isPresentCharactersEnabled } from '../../utils/presentCharacters.js';
+import { getTrackerPromptParts, getContextSummaryBlock } from '../progressiveSkills/integration/index.js';
 
 // Type imports
 /** @typedef {import('../../types/inventory.js').InventoryV2} InventoryV2 */
@@ -323,14 +324,15 @@ export function generateTrackerExample() {
  * @param {boolean} includeAttributes - Whether to include RPG attributes (false for separate tracker generation)
  * @returns {string} Formatted instruction text for the AI
  */
-export function generateTrackerInstructions(includeHtmlPrompt = true, includeContinuation = true, includeAttributes = true) {
+export function generateTrackerInstructions(includeHtmlPrompt = true, includeContinuation = true, includeAttributes = true, progressiveSkills = null) {
     const userName = getContext().name1;
     const classicStats = extensionSettings.classicStats;
     const trackerConfig = extensionSettings.trackerConfig;
     let instructions = '';
 
     // Check if any trackers are enabled
-    const hasAnyTrackers = extensionSettings.showUserStats || extensionSettings.showInfoBox || isPresentCharactersEnabled();
+    // progressiveSkills ({ schemaJSON, instructions }) is only passed by the separate/external tracker request
+    const hasAnyTrackers = extensionSettings.showUserStats || extensionSettings.showInfoBox || isPresentCharactersEnabled() || !!progressiveSkills;
 
     // Only add tracker instructions if at least one tracker is enabled
     if (hasAnyTrackers) {
@@ -364,6 +366,9 @@ export function generateTrackerInstructions(includeHtmlPrompt = true, includeCon
         if (isPresentCharactersEnabled()) {
             enabledTrackers.push('characters');
         }
+        if (progressiveSkills) {
+            enabledTrackers.push('progressiveSkills');
+        }
 
         if (enabledTrackers.length > 0) {
             instructions += '\n\nFORMAT:\n\nProvide EXACTLY ONE JSON code block with ALL tracker sections wrapped in a single object:\n\n```json\n{\n';
@@ -389,9 +394,21 @@ export function generateTrackerInstructions(includeHtmlPrompt = true, includeCon
                 const charactersJSON = buildCharactersJSONInstruction();
                 // Add 2 spaces to all lines after the first to properly nest within root object
                 instructions += charactersJSON.split('\n').map((line, i) => i === 0 ? line : '  ' + line).join('\n');
+                if (progressiveSkills) {
+                    instructions += ',\n';
+                }
+            }
+
+            if (progressiveSkills) {
+                instructions += '  "progressiveSkills": ';
+                instructions += progressiveSkills.schemaJSON.split('\n').map((line, i) => i === 0 ? line : '  ' + line).join('\n');
             }
 
             instructions += '\n}\n```\n\nDo NOT output multiple separate JSON objects. Everything must be in ONE unified object with the keys shown above.';
+        }
+
+        if (progressiveSkills) {
+            instructions += progressiveSkills.instructions;
         }
 
         // Only add continuation instruction if includeContinuation is true
@@ -1073,6 +1090,12 @@ export function generateContextualSummary() {
         }
     }
 
+    // Add Progressive Skills values if the feature is active (null otherwise)
+    const progressiveSkillsBlock = getContextSummaryBlock(chat);
+    if (progressiveSkillsBlock) {
+        summary += progressiveSkillsBlock + '\n';
+    }
+
     // Include attributes based on settings
     const alwaysSendAttributes = trackerConfig?.userStats?.alwaysSendAttributes;
     const showRPGAttributes = trackerConfig?.userStats?.showRPGAttributes !== false;
@@ -1189,7 +1212,7 @@ export function generateRPGPromptText() {
     promptText += `</previous>\n`;
 
     // Don't include HTML prompt, continuation instruction, or attributes for separate tracker generation
-    promptText += generateTrackerInstructions(false, false, false);
+    promptText += generateTrackerInstructions(false, false, false, getTrackerPromptParts(chat, userName));
 
     return promptText;
 }
