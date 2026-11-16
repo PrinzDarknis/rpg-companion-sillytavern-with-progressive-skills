@@ -18,7 +18,8 @@ export const SKILL_DEFAULTS = Object.freeze({
     progression: Object.freeze({
         enabled: true,
         startXp: 0,
-        threshold: '10',
+        // Slowly rising default that works without adjustment: 10 XP at value 0, 20 at 50, 30 at 100.
+        threshold: '10 + floor(skill / 5)',
     }),
 });
 

@@ -8,6 +8,7 @@ export const HISTORY_TYPES = Object.freeze({
     DIRECT_INCREASE: 'direct_increase',
     POINTS_EARNED: 'points_earned',
     POINTS_SPENT: 'points_spent',
+    MANUAL_EDIT: 'manual_edit',
     REJECTED: 'rejected',
 });
 
@@ -22,4 +23,6 @@ export const REJECTION_CODES = Object.freeze({
     POINT_POOL_FULL: 'POINT_POOL_FULL',
     INSUFFICIENT_POINTS: 'INSUFFICIENT_POINTS',
     EXCEEDS_MAXIMUM: 'EXCEEDS_MAXIMUM',
+    INVALID_VALUE: 'INVALID_VALUE',
+    INVALID_XP: 'INVALID_XP',
 });

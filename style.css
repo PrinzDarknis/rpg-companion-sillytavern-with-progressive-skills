@@ -12093,3 +12093,186 @@ body.documentstyle .rpg-inline-thoughts {
     overflow-wrap: anywhere;
     opacity: 0.9;
 }
+
+/* Progressive Skills — manual edit on the dashboard */
+.rpg-pskills-edit-btn {
+    flex-shrink: 0;
+    padding: 0.125em 0.375em;
+    background: transparent;
+    border: none;
+    color: var(--rpg-text);
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+.rpg-pskills-edit-btn:hover,
+.rpg-pskills-edit-btn:focus-visible {
+    opacity: 1;
+    color: var(--rpg-highlight);
+}
+
+.rpg-pskills-edit-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.375em;
+    margin: 0.25em 0;
+}
+
+.rpg-pskills-edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125em;
+}
+
+.rpg-pskills-edit-field input {
+    width: 5em;
+    padding: 0.25em;
+    background: var(--rpg-bg);
+    border: 1px solid var(--rpg-border);
+    border-radius: 0.25em;
+    color: var(--rpg-text);
+}
+
+.rpg-pskills-edit-save,
+.rpg-pskills-edit-cancel {
+    padding: 0.25em 0.625em;
+    background: var(--rpg-accent);
+    border: 1px solid var(--rpg-border);
+    border-radius: 0.25em;
+    color: var(--rpg-text);
+    cursor: pointer;
+}
+
+.rpg-pskills-edit-save:hover,
+.rpg-pskills-edit-cancel:hover {
+    border-color: var(--rpg-highlight);
+}
+
+.rpg-pskills-edit-error {
+    flex-basis: 100%;
+    color: var(--rpg-highlight);
+}
+
+/* Progressive Skills — tracker editor tab */
+.rpg-pskills-ed-hidden {
+    display: none !important;
+}
+
+.rpg-pskills-ed-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125em;
+    margin: 0.375em 0;
+    flex: 1;
+    min-width: 0;
+}
+
+.rpg-pskills-ed-field label {
+    font-size: 0.9em;
+    color: var(--rpg-text);
+    opacity: 0.9;
+}
+
+.rpg-pskills-ed-field textarea {
+    resize: vertical;
+}
+
+.rpg-pskills-ed-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75em;
+}
+
+.rpg-pskills-ed-grid .rpg-pskills-ed-field {
+    flex: 1 1 8em;
+}
+
+.rpg-pskills-editor .rpg-pskills-ed-invalid {
+    border-color: var(--rpg-highlight);
+    box-shadow: 0 0 0 1px var(--rpg-highlight);
+}
+
+.rpg-pskills-ed-skills {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    margin-bottom: 0.75em;
+}
+
+.rpg-pskills-ed-skill {
+    padding: 0.75em;
+    background: var(--rpg-accent);
+    border: 1px solid var(--rpg-border);
+    border-radius: 0.375em;
+}
+
+.rpg-pskills-ed-skill-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5em;
+}
+
+.rpg-pskills-ed-id {
+    font-size: 0.8em;
+    opacity: 0.6;
+    padding-bottom: 0.75em;
+    white-space: nowrap;
+}
+
+.rpg-pskills-ed-delete {
+    margin-bottom: 0.5em;
+    padding: 0.375em 0.5em;
+    background: transparent;
+    border: 1px solid var(--rpg-border);
+    border-radius: 0.25em;
+    color: var(--rpg-text);
+    cursor: pointer;
+}
+
+.rpg-pskills-ed-delete:hover {
+    border-color: var(--rpg-highlight);
+    color: var(--rpg-highlight);
+}
+
+.rpg-pskills-ed-add {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.rpg-pskills-ed-add .rpg-text-input {
+    flex: 1;
+    margin-top: 0;
+}
+
+.rpg-pskills-ed-add .rpg-btn-secondary {
+    flex-shrink: 0;
+}
+
+.rpg-pskills-ed-errors,
+.rpg-pskills-ed-diagnostics {
+    margin: 0.25em 0;
+    padding-left: 1.25em;
+    font-size: 0.85em;
+}
+
+.rpg-pskills-ed-errors:empty,
+.rpg-pskills-ed-diagnostics:empty {
+    display: none;
+}
+
+.rpg-pskills-ed-errors li,
+.rpg-pskills-ed-diag-fatal {
+    color: var(--rpg-highlight);
+}
+
+.rpg-pskills-ed-diag-recovered {
+    color: var(--rpg-text);
+    opacity: 0.85;
+}
+
+.rpg-pskills-ed-empty {
+    opacity: 0.7;
+    font-style: italic;
+}

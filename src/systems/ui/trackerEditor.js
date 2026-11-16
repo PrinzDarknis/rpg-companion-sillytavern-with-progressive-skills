@@ -29,6 +29,7 @@ import {
 } from '../../core/persistence.js';
 import { renderUserStats } from '../rendering/userStats.js';
 import { renderProgressiveSkills } from '../rendering/progressiveSkills.js';
+import { canSaveProgressiveSkills, initProgressiveSkillsTab, renderProgressiveSkillsTab } from './progressiveSkillsEditor.js';
 import { renderInfoBox } from '../rendering/infoBox.js';
 import { renderThoughts } from '../rendering/thoughts.js';
 import { updateFabWidgets } from './mobile.js';
@@ -92,8 +93,11 @@ export function initTrackerEditor() {
         $(`#rpg-editor-tab-${activeTab}`).show();
     });
 
+    initProgressiveSkillsTab();
+
     // Save button
     $(document).on('click', '#rpg-editor-save', function () {
+        if (!canSaveProgressiveSkills()) return;
         applyTrackerConfig();
         closeTrackerEditor();
     });
@@ -751,6 +755,7 @@ function renderEditorUI() {
     renderInfoBoxTab();
     renderPresentCharactersTab();
     renderHistoryPersistenceTab();
+    renderProgressiveSkillsTab();
 }
 
 /**

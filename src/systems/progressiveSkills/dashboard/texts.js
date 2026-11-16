@@ -1,6 +1,8 @@
 /**
  * Progressive Skills — i18n keys of the dashboard section with their English fallbacks.
  */
+import { createLookup } from '../shared/index.js';
+
 export const DASHBOARD_TEXTS = {
     title: ['progressiveSkills.title', 'Progressive Skills'],
     empty: ['progressiveSkills.empty', 'No skills configured yet.'],
@@ -13,6 +15,15 @@ export const DASHBOARD_TEXTS = {
     thresholdInvalid: ['progressiveSkills.thresholdInvalid',
         'Threshold invalid — XP keeps accumulating, no level-ups until fixed'],
     freePoints: ['progressiveSkills.freePoints', 'Free skill points'],
+    edit: ['progressiveSkills.edit.button', 'Edit value and XP'],
+    editValue: ['progressiveSkills.edit.value', 'Value'],
+    editXp: ['progressiveSkills.edit.xp', 'XP'],
+    editSave: ['progressiveSkills.edit.save', 'Save'],
+    editCancel: ['progressiveSkills.edit.cancel', 'Cancel'],
+    editInvalidValue: ['progressiveSkills.edit.invalidValue', 'Value must be a whole number between 0 and {max}.'],
+    editInvalidXp: ['progressiveSkills.edit.invalidXp', 'XP must be a whole number of at least 0.'],
+    editNoTarget: ['progressiveSkills.edit.noTarget', 'There is no message yet that could store the change.'],
+    editFailed: ['progressiveSkills.edit.failed', 'The change could not be applied.'],
 };
 
 /**
@@ -21,9 +32,5 @@ export const DASHBOARD_TEXTS = {
  * @returns {(name: keyof DASHBOARD_TEXTS, params?: object) => string} Plain (unescaped) text
  */
 export function createTextLookup(translate) {
-    return (name, params = {}) => {
-        const [key, fallback] = DASHBOARD_TEXTS[name];
-        const text = (translate && translate(key)) || fallback;
-        return text.replace(/\{(\w+)\}/g, (match, param) => (param in params ? String(params[param]) : match));
-    };
+    return createLookup(DASHBOARD_TEXTS, translate);
 }
