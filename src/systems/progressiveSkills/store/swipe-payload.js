@@ -1,10 +1,11 @@
 /**
  * Progressive Skills — reading and writing the per-swipe payload of a chat message.
  *
- * Payload: { deltas: { analysis, spends, manual? }, state, history }
+ * Payload: { deltas: { analysis, actions }, state, history }
  *   deltas.analysis: the parsed AI analysis of this turn without spends ({ skillUpdates, pointsEarned? }) or null
- *   deltas.spends:   authorized point spends applied in this turn ([{ skillId, amount, source }])
- *   deltas.manual:   manual edits by the user ([{ skillId, value, xp, source }], absolute values; only when present)
+ *   deltas.actions:  user actions in chronological order, applied after the analysis (see ACTION_TYPES):
+ *                    point spends (UI or confirmed model proposals), manual edits of skills and of the free-point
+ *                    balance, declined model proposals
  *   state:           resulting state after the deltas (see model/state.js)
  *   history:         history entries of this turn only
  *

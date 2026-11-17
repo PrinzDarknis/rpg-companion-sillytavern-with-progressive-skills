@@ -34,6 +34,7 @@ import { renderThoughts } from '../rendering/thoughts.js';
 import { renderInventory } from '../rendering/inventory.js';
 import { renderQuests } from '../rendering/quests.js';
 import { renderProgressiveSkills } from '../rendering/progressiveSkills.js';
+import { showSpendProposals } from '../ui/progressiveSkillsSpendConfirm.js';
 import { renderMusicPlayer } from '../rendering/musicPlayer.js';
 import { i18n } from '../../core/i18n.js';
 import { generateAvatarsForCharacters } from '../features/avatarGenerator.js';
@@ -362,6 +363,8 @@ export async function updateRPGData(renderUserStats, renderInfoBox, renderThough
             // Render the updated data
             renderUserStats();
             renderProgressiveSkills();
+            // Point spends proposed by the model: applied only after the user's confirmation (toast)
+            showSpendProposals(progressiveSkillsResult);
             renderInfoBox();
             renderThoughts();
             renderInventory();

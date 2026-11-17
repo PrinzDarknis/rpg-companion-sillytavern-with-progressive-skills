@@ -7,5 +7,8 @@
  */
 export const STORE_KEY = 'rpg_companion_progressive_skills';
 
-/** Result code of saveManualEdit: the chat has no assistant message that could carry the edit. */
-export const MANUAL_EDIT_NO_TARGET = 'NO_TARGET';
+/** Result code of saveUserAction: the chat has no assistant message that could carry the action. */
+export const ACTION_NO_TARGET = 'NO_TARGET';
+
+/** Result code of saveUserAction: the swipe a model proposal was made for is no longer the current one. */
+export const ACTION_EXPIRED = 'EXPIRED';

@@ -12095,7 +12095,9 @@ body.documentstyle .rpg-inline-thoughts {
 }
 
 /* Progressive Skills — manual edit on the dashboard */
-.rpg-pskills-edit-btn {
+.rpg-pskills-edit-btn,
+.rpg-pskills-spend-btn,
+.rpg-pskills-points-edit-btn {
     flex-shrink: 0;
     padding: 0.125em 0.375em;
     background: transparent;
@@ -12106,12 +12108,23 @@ body.documentstyle .rpg-inline-thoughts {
 }
 
 .rpg-pskills-edit-btn:hover,
-.rpg-pskills-edit-btn:focus-visible {
+.rpg-pskills-edit-btn:focus-visible,
+.rpg-pskills-spend-btn:not(:disabled):hover,
+.rpg-pskills-spend-btn:not(:disabled):focus-visible,
+.rpg-pskills-points-edit-btn:hover,
+.rpg-pskills-points-edit-btn:focus-visible {
     opacity: 1;
     color: var(--rpg-highlight);
 }
 
-.rpg-pskills-edit-form {
+.rpg-pskills-spend-btn:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+.rpg-pskills-edit-form,
+.rpg-pskills-spend-form,
+.rpg-pskills-points-form {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -12135,7 +12148,11 @@ body.documentstyle .rpg-inline-thoughts {
 }
 
 .rpg-pskills-edit-save,
-.rpg-pskills-edit-cancel {
+.rpg-pskills-edit-cancel,
+.rpg-pskills-spend-save,
+.rpg-pskills-spend-cancel,
+.rpg-pskills-points-save,
+.rpg-pskills-points-cancel {
     padding: 0.25em 0.625em;
     background: var(--rpg-accent);
     border: 1px solid var(--rpg-border);
@@ -12145,13 +12162,32 @@ body.documentstyle .rpg-inline-thoughts {
 }
 
 .rpg-pskills-edit-save:hover,
-.rpg-pskills-edit-cancel:hover {
+.rpg-pskills-edit-cancel:hover,
+.rpg-pskills-spend-save:hover,
+.rpg-pskills-spend-cancel:hover,
+.rpg-pskills-points-save:hover,
+.rpg-pskills-points-cancel:hover {
     border-color: var(--rpg-highlight);
 }
 
 .rpg-pskills-edit-error {
     flex-basis: 100%;
     color: var(--rpg-highlight);
+}
+
+.rpg-pskills-spend-form .rpg-pskills-hint {
+    align-self: center;
+}
+
+/* Progressive Skills — confirmation toast for point spends proposed by the model */
+.rpg-pskills-proposal-buttons {
+    display: flex;
+    gap: 0.5em;
+    margin-top: 0.5em;
+}
+
+.rpg-pskills-proposal-buttons .menu_button {
+    margin: 0;
 }
 
 /* Progressive Skills — tracker editor tab */

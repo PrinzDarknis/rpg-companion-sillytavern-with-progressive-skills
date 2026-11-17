@@ -1,26 +1,36 @@
 /**
- * Progressive Skills — HTML of the dashboard section (read-only display, spec §10).
+ * Progressive Skills — HTML of the dashboard section (spec §10): display plus the buttons that open the inline
+ * forms (manual edit, point spending, free-point balance; see forms-html.js).
  *
  * Everything inserted is escaped, including translations and numbers.
  */
 import { escapeHtml } from '../shared/index.js';
+import { editFormHtml, pointsFormHtml, spendFormHtml } from './forms-html.js';
 
 /**
  * @param {{skills: object[], freePoints: object|null}} model - From buildDashboardModel
  * @param {(name: string, params?: object) => string} text - From createTextLookup
- * @param {{editing?: {skillId: string, error?: string|null, value?: string, xp?: string}|null}} [options]
- *   `editing`: the skill whose manual-edit form is open; `error` is an edit result code, `value`/`xp` the entered text
+ * @param {object} [options] - Open inline form (at most one); `error` is a result code, the other fields the entered text
+ * @param {{skillId: string, error?: string|null, value?: string, xp?: string}|null} [options.editing] - Manual edit
+ * @param {{skillId: string, error?: string|null, amount?: string}|null} [options.spending] - Point spending
+ * @param {{error?: string|null, value?: string}|null} [options.pointsEditing] - Free-point balance
  * @returns {string}
  */
 export function buildDashboardHtml(model, text, options = {}) {
     const editing = options.editing ?? null;
+    const spending = options.spending ?? null;
     const parts = [`<div class="rpg-pskills-header"><h4 class="rpg-pskills-title">${escapeHtml(text('title'))}</h4>`];
     if (model.freePoints) parts.push(freePointsHtml(model.freePoints, text));
     parts.push('</div>');
+    if (model.freePoints && options.pointsEditing) parts.push(pointsFormHtml(model.freePoints, options.pointsEditing, text));
     if (model.skills.length === 0) {
         parts.push(`<div class="rpg-pskills-empty">${escapeHtml(text('empty'))}</div>`);
     } else {
-        parts.push('<div class="rpg-pskills-list">', ...model.skills.map(skill => skillHtml(skill, text, editing?.skillId === skill.id ? editing : null)), '</div>');
+        parts.push('<div class="rpg-pskills-list">', ...model.skills.map(skill => skillHtml(skill, text, {
+            freePoints: model.freePoints,
+            editing: editing?.skillId === skill.id ? editing : null,
+            spending: spending?.skillId === skill.id ? spending : null,
+        })), '</div>');
     }
     return parts.join('');
 }
@@ -28,10 +38,12 @@ export function buildDashboardHtml(model, text, options = {}) {
 function freePointsHtml(points, text) {
     const value = points.max === null ? `${points.available}` : `${points.available}/${points.max}`;
     return `<div class="rpg-pskills-free-points"><span class="rpg-pskills-free-points-label">${escapeHtml(text('freePoints'))}:</span>`
-        + ` <span class="rpg-pskills-free-points-value">${escapeHtml(value)}</span></div>`;
+        + ` <span class="rpg-pskills-free-points-value">${escapeHtml(value)}</span>`
+        + iconButtonHtml('rpg-pskills-points-edit-btn', 'fa-pen', text('pointsEdit'))
+        + '</div>';
 }
 
-function skillHtml(skill, text, editing) {
+function skillHtml(skill, text, { freePoints, editing, spending }) {
     const classes = ['rpg-pskills-skill'];
     if (skill.maxed) classes.push('rpg-pskills-maxed');
     if (skill.progression?.suspended) classes.push('rpg-pskills-suspended');
@@ -41,13 +53,25 @@ function skillHtml(skill, text, editing) {
         + ` <span class="rpg-pskills-level">${escapeHtml(skill.value)}</span></span>`
         + statusHtml(skill, text)
         + `<span class="rpg-pskills-value">${escapeHtml(`${skill.value}/${skill.maximum}`)}</span>`
-        + `<button type="button" class="rpg-pskills-edit-btn" title="${escapeHtml(text('edit'))}" aria-label="${escapeHtml(text('edit'))}">`
-        + '<i class="fa-solid fa-pen"></i></button>'
+        + (freePoints ? spendButtonHtml(skill, freePoints, text) : '')
+        + iconButtonHtml('rpg-pskills-edit-btn', 'fa-pen', text('edit'))
         + '</div>'
         + (editing ? editFormHtml(skill, editing, text) : '')
+        + (spending && freePoints ? spendFormHtml(skill, freePoints, spending, text) : '')
         + (skill.progression ? progressionHtml(skill.progression, text) : '')
         + descriptionHtml(skill.description, text)
         + '</div>';
+}
+
+/** Disabled while no point is available or the skill is maxed. */
+function spendButtonHtml(skill, freePoints, text) {
+    const disabled = freePoints.available <= 0 || skill.maxed;
+    return iconButtonHtml('rpg-pskills-spend-btn', 'fa-plus', text('spend'), disabled);
+}
+
+function iconButtonHtml(className, icon, label, disabled = false) {
+    return `<button type="button" class="${className}" title="${escapeHtml(label)}" aria-label="${escapeHtml(label)}"`
+        + `${disabled ? ' disabled' : ''}><i class="fa-solid ${icon}"></i></button>`;
 }
 
 const STATUS = {
@@ -92,34 +116,4 @@ function descriptionHtml(description, text) {
         + `<summary>${escapeHtml(text('description'))}</summary>`
         + `<div class="rpg-pskills-description-text">${escapeHtml(description)}</div>`
         + '</details>';
-}
-
-const EDIT_ERRORS = {
-    INVALID_VALUE: 'editInvalidValue',
-    INVALID_XP: 'editInvalidXp',
-    NO_TARGET: 'editNoTarget',
-};
-
-/** Inline form for a manual edit: value always, XP only with progression enabled. */
-function editFormHtml(skill, editing, text) {
-    const value = editing.value ?? String(skill.value);
-    const parts = ['<div class="rpg-pskills-edit-form">',
-        '<label class="rpg-pskills-edit-field">', `<span>${escapeHtml(text('editValue'))}</span>`,
-        `<input type="number" class="rpg-pskills-edit-value" min="0" max="${escapeHtml(skill.maximum)}" step="1" value="${escapeHtml(value)}">`,
-        '</label>'];
-    if (skill.progression) {
-        const xp = editing.xp ?? String(skill.progression.xp);
-        parts.push('<label class="rpg-pskills-edit-field">', `<span>${escapeHtml(text('editXp'))}</span>`,
-            `<input type="number" class="rpg-pskills-edit-xp" min="0" step="1" value="${escapeHtml(xp)}">`, '</label>');
-    }
-    parts.push(
-        `<button type="button" class="rpg-pskills-edit-save">${escapeHtml(text('editSave'))}</button>`,
-        `<button type="button" class="rpg-pskills-edit-cancel">${escapeHtml(text('editCancel'))}</button>`,
-    );
-    if (editing.error) {
-        const message = text(EDIT_ERRORS[editing.error] ?? 'editFailed', { max: skill.maximum });
-        parts.push(`<div class="rpg-pskills-edit-error" role="alert">${escapeHtml(message)}</div>`);
-    }
-    parts.push('</div>');
-    return parts.join('');
 }

@@ -72,6 +72,7 @@ import {
 import { renderInventory } from './src/systems/rendering/inventory.js';
 import { renderQuests } from './src/systems/rendering/quests.js';
 import { renderProgressiveSkills } from './src/systems/rendering/progressiveSkills.js';
+import { clearSpendProposals } from './src/systems/ui/progressiveSkillsSpendConfirm.js';
 import { renderMusicPlayer } from './src/systems/rendering/musicPlayer.js';
 import { toggleSnowflakes, initSnowflakes } from './src/systems/ui/snowflakes.js';
 import { toggleDynamicWeather, initWeatherEffects, updateWeatherEffect } from './src/systems/ui/weatherEffects.js';
@@ -1437,7 +1438,7 @@ jQuery(async () => {
                 [event_types.MESSAGE_RECEIVED]: onMessageReceived,
                 [event_types.GENERATION_STOPPED]: onGenerationEnded,
                 [event_types.GENERATION_ENDED]: onGenerationEnded,
-                [event_types.CHAT_CHANGED]: [onCharacterChanged, updatePersonaAvatar, restoreCheckpointOnLoad, clearSessionAvatarPrompts],
+                [event_types.CHAT_CHANGED]: [onCharacterChanged, updatePersonaAvatar, restoreCheckpointOnLoad, clearSessionAvatarPrompts, clearSpendProposals],
                 [event_types.CHAT_LOADED]: onChatLoaded,
                 [event_types.MESSAGE_DELETED]: onMessageDeleted,
                 [event_types.MESSAGE_SWIPE_DELETED]: onMessageDeleted,

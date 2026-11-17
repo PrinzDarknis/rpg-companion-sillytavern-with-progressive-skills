@@ -5,4 +5,6 @@ export { getConfig, getActiveConfig } from './settings.js';
 export { getAnalysisTargetIndex } from './analysis-target.js';
 export { getTrackerPromptParts, getContextSummaryBlock } from './prompt-sections.js';
 export { processTrackerResponse } from './tracker-update.js';
-export { MANUAL_EDIT_INACTIVE, applyManualSkillEdit } from './manual-edit.js';
+export {
+    ACTION_INACTIVE, applyManualSkillEdit, spendSkillPoints, setFreeSkillPoints, confirmProposedSpend, declineProposedSpend,
+} from './user-actions.js';
