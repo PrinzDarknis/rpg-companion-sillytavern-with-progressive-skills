@@ -16,6 +16,7 @@ import {
 import { getCurrentState } from '../progressiveSkills/store/index.js';
 import { buildDashboardHtml, buildDashboardModel, createTextLookup } from '../progressiveSkills/dashboard/index.js';
 import { parseInteger } from '../progressiveSkills/shared/index.js';
+import { placeProgressiveSkillsSection } from '../ui/progressiveSkillsTab.js';
 
 /**
  * Open inline form or null: { kind: 'edit' | 'spend' | 'points', skillId?, error?, ...entered text }.
@@ -23,7 +24,8 @@ import { parseInteger } from '../progressiveSkills/shared/index.js';
 let form = null;
 
 /**
- * Shows the section only while the feature is active (enabled, separate/external mode).
+ * Shows the section only while the feature is active (enabled, separate/external mode) and places it in the Status
+ * tab or the own "Skills" tab (preset option `displayInOwnTab`).
  * @returns {object|null} The active configuration, or null when hidden
  */
 export function updateProgressiveSkillsVisibility() {
@@ -35,6 +37,7 @@ export function updateProgressiveSkillsVisibility() {
     } else {
         $container.hide();
     }
+    placeProgressiveSkillsSection(config);
     return config;
 }
 

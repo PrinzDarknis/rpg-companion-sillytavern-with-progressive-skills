@@ -80,6 +80,8 @@ function generalHtml(config, errors, invalid, text) {
         + toggleHtml('rpg-pskills-ed-descriptions', 'includeDescriptionsInContext', config.includeDescriptionsInContext,
             text('includeDescriptions'))
         + `<p class="rpg-editor-hint">${escapeHtml(text('includeDescriptionsHint'))}</p>`
+        + toggleHtml('rpg-pskills-ed-own-tab', 'displayInOwnTab', config.displayInOwnTab, text('displayInOwnTab'))
+        + `<p class="rpg-editor-hint">${escapeHtml(text('displayInOwnTabHint'))}</p>`
         + numberHtml({ id: 'rpg-pskills-ed-max-delta', field: 'maxDelta', value: config.maxDelta, min: 1,
             label: text('maxDelta'), invalid: invalid.has('|maxDelta') })
         + `<p class="rpg-editor-hint">${escapeHtml(text('maxDeltaHint'))}</p>`

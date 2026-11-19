@@ -23,6 +23,7 @@ export const SKILL_FIELDS = Object.freeze({
 export const CONFIG_FIELDS = Object.freeze({
     enabled: 'boolean',
     includeDescriptionsInContext: 'boolean',
+    displayInOwnTab: 'boolean',
     maxDelta: 'integer',
     'freeSkillPoints.enabled': 'boolean',
     'freeSkillPoints.start': 'integer',

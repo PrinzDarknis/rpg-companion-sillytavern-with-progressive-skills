@@ -9,6 +9,8 @@ import { closeMobilePanelWithAnimation, updateCollapseToggleIcon } from './layou
 import { setupDesktopTabs, removeDesktopTabs } from './desktop.js';
 import { i18n } from '../../core/i18n.js';
 import { hexToRgba } from './theme.js';
+import { getActiveConfig } from '../progressiveSkills/integration/index.js';
+import { placeProgressiveSkillsSection, skillsTabButtonHtml } from './progressiveSkillsTab.js';
 
 /**
  * Updates the text labels of the mobile navigation tabs based on the current language.
@@ -35,6 +37,9 @@ export function updateMobileTabLabels() {
             case 'quests':
                 translationKey = 'global.quests';
                 break;
+            case 'skills':
+                translationKey = 'progressiveSkills.tabName';
+                break;
         }
 
         if (translationKey) {
@@ -51,6 +56,9 @@ export function updateMobileTabLabels() {
                     break;
                 case 'quests':
                     fallback = 'Quests';
+                    break;
+                case 'skills':
+                    fallback = 'Skills';
                     break;
             }
             const translation = i18n.getTranslation(translationKey) || fallback;
@@ -637,6 +645,10 @@ export function setupMobileTabs() {
         tabs.push('<button class="rpg-mobile-tab ' + (tabs.length === 0 ? 'active' : '') + '" data-tab="quests"><i class="fa-solid fa-scroll"></i><span>' + (i18n.getTranslation('global.quests') || 'Quests') + '</span></button>');
     }
 
+    // Progressive Skills tab after Stats (hidden; shown by placeProgressiveSkillsSection when the preset option is on).
+    // Inserted last so the "first tab is active" logic above stays unchanged.
+    tabs.splice(hasStats ? 1 : 0, 0, skillsTabButtonHtml('rpg-mobile-tab', i18n.getTranslation('progressiveSkills.tabName') || 'Skills'));
+
     const $tabNav = $('<div class="rpg-mobile-tabs">' + tabs.join('') + '</div>');
 
     // Determine which tab should be active
@@ -649,6 +661,7 @@ export function setupMobileTabs() {
     // Create tab content wrappers
     const $statsTab = $('<div class="rpg-mobile-tab-content ' + (firstTab === 'stats' ? 'active' : '') + '" data-tab-content="stats"></div>');
     const $infoTab = $('<div class="rpg-mobile-tab-content ' + (firstTab === 'info' ? 'active' : '') + '" data-tab-content="info"></div>');
+    const $skillsTab = $('<div class="rpg-mobile-tab-content" data-tab-content="skills"></div>');
     const $inventoryTab = $('<div class="rpg-mobile-tab-content ' + (firstTab === 'inventory' ? 'active' : '') + '" data-tab-content="inventory"></div>');
     const $questsTab = $('<div class="rpg-mobile-tab-content ' + (firstTab === 'quests' ? 'active' : '') + '" data-tab-content="quests"></div>');
 
@@ -698,6 +711,7 @@ export function setupMobileTabs() {
     // Always append all tab content wrappers to preserve elements
     // Tab buttons control visibility
     $mobileContainer.append($statsTab);
+    $mobileContainer.append($skillsTab);
     $mobileContainer.append($infoTab);
     $mobileContainer.append($inventoryTab);
     $mobileContainer.append($questsTab);
@@ -717,6 +731,8 @@ export function setupMobileTabs() {
         $mobileContainer.find('.rpg-mobile-tab-content').removeClass('active');
         $mobileContainer.find('[data-tab-content="' + tabName + '"]').addClass('active');
     });
+
+    placeProgressiveSkillsSection(getActiveConfig());
 }
 
 /**

@@ -11944,6 +11944,13 @@ body.documentstyle .rpg-inline-thoughts {
     max-height: 50%;
 }
 
+/* In the own "Skills" tab the section takes the whole tab (no half-height cap) */
+.rpg-tab-content[data-tab-content="skills"] .rpg-section.rpg-pskills-section,
+.rpg-mobile-tab-content[data-tab-content="skills"] .rpg-section.rpg-pskills-section {
+    flex: 1 1 auto;
+    max-height: none;
+}
+
 .rpg-pskills-section {
     display: flex;
     flex-direction: column;

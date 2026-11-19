@@ -2,8 +2,9 @@
  * Progressive Skills — configuration (stored in extensionSettings.trackerConfig.progressiveSkills).
  *
  * Shape:
- *   { schemaVersion, enabled, includeDescriptionsInContext, maxDelta, skills: Skill[], freeSkillPoints }
+ *   { schemaVersion, enabled, includeDescriptionsInContext, displayInOwnTab, maxDelta, skills: Skill[], freeSkillPoints }
  *   includeDescriptionsInContext: also send skill descriptions in the chat context (values are always sent)
+ *   displayInOwnTab: show the dashboard section in an own "Skills" tab instead of the Status tab (display only)
  *   maxDelta: largest accepted single delta (XP, direct increase, points) per proposal; larger ones are rejected
  *   Skill = { id, name, description, startValue, maximumValue, growthCondition,
  *             progression: { enabled, startXp, threshold } }
@@ -20,6 +21,7 @@ export function createDefaultConfig() {
         schemaVersion: SCHEMA_VERSION,
         enabled: false,
         includeDescriptionsInContext: false,
+        displayInOwnTab: false,
         maxDelta: DEFAULT_MAX_DELTA,
         skills: [],
         freeSkillPoints: { ...FREE_POINTS_DEFAULTS },
@@ -51,6 +53,7 @@ export function normalizeConfig(raw) {
 
     config.enabled = pick(raw.enabled, 'boolean', config.enabled);
     config.includeDescriptionsInContext = pick(raw.includeDescriptionsInContext, 'boolean', config.includeDescriptionsInContext);
+    config.displayInOwnTab = pick(raw.displayInOwnTab, 'boolean', config.displayInOwnTab);
     config.maxDelta = pick(raw.maxDelta, 'number', config.maxDelta);
     const usedIds = [];
     config.skills = (Array.isArray(raw.skills) ? raw.skills : []).filter(isObject).map(skill => {

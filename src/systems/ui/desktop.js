@@ -6,6 +6,8 @@
 import { i18n } from '../../core/i18n.js';
 import { extensionSettings, lastGeneratedData, committedTrackerData } from '../../core/state.js';
 import { hexToRgba } from './theme.js';
+import { getActiveConfig } from '../progressiveSkills/integration/index.js';
+import { placeProgressiveSkillsSection, skillsTabButtonHtml } from './progressiveSkillsTab.js';
 
 /**
  * Helper to parse time string and calculate clock hand angles
@@ -312,6 +314,9 @@ export function setupDesktopTabs() {
         </button>
     `);
 
+    // Progressive Skills tab (hidden; shown by placeProgressiveSkillsSection when the preset option is on)
+    tabButtons.push(skillsTabButtonHtml('rpg-tab-btn', i18n.getTranslation('progressiveSkills.tabName') || 'Skills'));
+
     // Inventory tab (only if enabled in settings)
     if (hasInventory) {
         tabButtons.push(`
@@ -336,6 +341,7 @@ export function setupDesktopTabs() {
 
     // Create tab content containers
     const $statusTab = $('<div class="rpg-tab-content active" data-tab-content="status"></div>');
+    const $skillsTab = $('<div class="rpg-tab-content" data-tab-content="skills"></div>');
     const $inventoryTab = $('<div class="rpg-tab-content" data-tab-content="inventory"></div>');
     const $questsTab = $('<div class="rpg-tab-content" data-tab-content="quests"></div>');
 
@@ -379,6 +385,7 @@ export function setupDesktopTabs() {
     const $tabsContainer = $('<div class="rpg-tabs-container"></div>');
     $tabsContainer.append($tabNav);
     $tabsContainer.append($statusTab);
+    $tabsContainer.append($skillsTab);
 
     // Always append inventory and quests tabs to preserve the elements
     // But they'll only show if enabled (via tab button visibility)
@@ -401,6 +408,8 @@ export function setupDesktopTabs() {
         $('.rpg-tab-content').removeClass('active');
         $(`.rpg-tab-content[data-tab-content="${tabName}"]`).addClass('active');
     });
+
+    placeProgressiveSkillsSection(getActiveConfig());
 
 
 }
