@@ -35,6 +35,7 @@ import { renderInventory } from '../rendering/inventory.js';
 import { renderQuests } from '../rendering/quests.js';
 import { renderProgressiveSkills } from '../rendering/progressiveSkills.js';
 import { showSpendProposals } from '../ui/progressiveSkillsSpendConfirm.js';
+import { showUpdateToast } from '../ui/progressiveSkillsUpdateToast.js';
 import { renderMusicPlayer } from '../rendering/musicPlayer.js';
 import { i18n } from '../../core/i18n.js';
 import { generateAvatarsForCharacters } from '../features/avatarGenerator.js';
@@ -365,6 +366,8 @@ export async function updateRPGData(renderUserStats, renderInfoBox, renderThough
             renderProgressiveSkills();
             // Point spends proposed by the model: applied only after the user's confirmation (toast)
             showSpendProposals(progressiveSkillsResult);
+            // Compact summary of the applied Progressive Skills changes (global setting)
+            showUpdateToast(progressiveSkillsResult);
             renderInfoBox();
             renderThoughts();
             renderInventory();

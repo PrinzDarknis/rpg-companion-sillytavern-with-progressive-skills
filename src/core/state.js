@@ -25,6 +25,7 @@ export let extensionSettings = {
     hideDefaultExpressionDisplay: false,
     showInventory: true, // Show inventory section (v2 system)
     showQuests: true, // Show quests section
+    showProgressiveSkillsUpdateToast: true, // Compact toast with the Progressive Skills changes after each tracker update
     showThoughtsInChat: true, // Show thoughts overlay in chat
     thoughtsInChatStyle: 'corner', // 'corner' or 'inline'
     narratorMode: false, // Use character card as narrator instead of fixed character references

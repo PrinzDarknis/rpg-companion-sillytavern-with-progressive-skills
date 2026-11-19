@@ -6,6 +6,7 @@
  */
 import { addDebugLog, extensionSettings } from '../../../core/state.js';
 import { HISTORY_TYPES, spendPoints } from '../progression/index.js';
+import { selectUpdateChanges } from '../notify/index.js';
 import { parseAnalysis } from '../response/index.js';
 import { getSelectedSwipeId, saveTurn } from '../store/index.js';
 import { getAnalysisTargetIndex } from './analysis-target.js';
@@ -15,7 +16,8 @@ import { getActiveConfig } from './settings.js';
  * Point spends proposed by the model are never applied here (spec §5.4, §14). Each one is checked against the
  * stored state of this turn: valid ones are returned as `proposals` for the user's confirmation, invalid ones as
  * `invalidProposals` (with the rejection code) so the user learns why nothing happens.
- * @returns {{found: boolean, stored: boolean, pendingSpends: object[], proposals: object[], invalidProposals: object[]}|null}
+ * `changes` are the applied changes of the model analysis (history entries) for the update toast.
+ * @returns {{found: boolean, stored: boolean, pendingSpends: object[], proposals: object[], invalidProposals: object[], changes: object[]}|null}
  *   null when inactive or on failure. A proposal is `{ skillId, skillName, amount, messageIndex, swipeId }`.
  * @param {string} response - Raw model response
  * @param {object[]} chat
@@ -39,7 +41,14 @@ export function processTrackerResponse(response, chat) {
         const { proposals, invalidProposals } = checkProposals(result, config, chat, target);
         if (proposals.length > 0) debug('Progressive Skills point spends need confirmation', proposals);
         if (invalidProposals.length > 0) debug('Progressive Skills point spend proposals rejected', invalidProposals);
-        return { found: parsed.found && !parsed.error, stored: true, pendingSpends: result.pendingSpends, proposals, invalidProposals };
+        return {
+            found: parsed.found && !parsed.error,
+            stored: true,
+            pendingSpends: result.pendingSpends,
+            proposals,
+            invalidProposals,
+            changes: selectUpdateChanges(result.payload.history),
+        };
     } catch (error) {
         console.error('[RPG Companion] Progressive Skills update failed:', error);
         return null;

@@ -400,6 +400,11 @@ async function initUI() {
         updateSectionVisibility();
     });
 
+    $('#rpg-toggle-pskills-update-toast').on('change', function() {
+        extensionSettings.showProgressiveSkillsUpdateToast = $(this).prop('checked');
+        saveSettings();
+    });
+
     $('#rpg-toggle-lock-icons').on('change', function() {
         extensionSettings.showLockIcons = $(this).prop('checked');
         saveSettings();
@@ -1127,6 +1132,7 @@ async function initUI() {
     $('#rpg-toggle-hide-default-expressions').prop('checked', extensionSettings.hideDefaultExpressionDisplay === true);
     $('#rpg-toggle-inventory').prop('checked', extensionSettings.showInventory);
     $('#rpg-toggle-quests').prop('checked', extensionSettings.showQuests);
+    $('#rpg-toggle-pskills-update-toast').prop('checked', extensionSettings.showProgressiveSkillsUpdateToast !== false);
     $('#rpg-toggle-lock-icons').prop('checked', extensionSettings.showLockIcons ?? true);
     $('#rpg-toggle-thoughts-in-chat').prop('checked', extensionSettings.showThoughtsInChat);
     $('#rpg-toggle-inline-thoughts').prop('checked', (extensionSettings.thoughtsInChatStyle || 'corner') === 'inline');
