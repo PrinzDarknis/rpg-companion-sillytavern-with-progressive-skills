@@ -16,7 +16,7 @@ import { i18n } from '../../core/i18n.js';
 import { extensionSettings } from '../../core/state.js';
 import { normalizeConfig } from '../progressiveSkills/model/index.js';
 import {
-    addSkill, buildEditorLayout, buildEditorTabHtml, checkAllThresholds, checkThreshold, createEditorTextLookup,
+    GROUPS_LIST_ID, addSkill, buildEditorLayout, buildEditorTabHtml, checkAllThresholds, checkThreshold, createEditorTextLookup,
     diagnosticsHtml, errorListHtml, getEditorErrors, getSaveBlockers, groupErrors, groupOptionsHtml, invalidFields,
     removeSkill, setConfigField, skillSummaryHtml, skillsWithErrors, syncEditorLayout,
 } from '../progressiveSkills/editor/index.js';
@@ -60,6 +60,12 @@ export function initProgressiveSkillsTab() {
         })
         .on('change.pskillsEditor', `${TAB} [data-pskills-field]`, function () {
             if (this.dataset.pskillsField !== 'progression.threshold') onFieldChange(this);
+        })
+        .on('focusin.pskillsEditor', `${TAB} [data-pskills-field="group"]`, function () {
+            attachGroupSuggestions(this);
+        })
+        .on('focusout.pskillsEditor', `${TAB} [data-pskills-field="group"]`, function () {
+            detachGroupSuggestions(this);
         })
         .on('click.pskillsEditor', `${TAB} .rpg-pskills-ed-add-btn`, () => onAddSkill())
         .on('keydown.pskillsEditor', `${TAB} .rpg-pskills-ed-new-name`, event => {
@@ -197,9 +203,24 @@ function refreshSummary(skillId) {
     if (skill) findCard(skillId).children('summary').html(skillSummaryHtml(skill, text()));
 }
 
-/** Updates the group suggestions in place (keeps the focus and the layout). */
+/**
+ * Group suggestions exist only while a group input is focused: only that input gets `list` and the datalist gets
+ * the current groups. Permanent `list` attributes on all group inputs made desktop Chrome sluggish page-wide.
+ */
+function attachGroupSuggestions(input) {
+    $(`${TAB} #${GROUPS_LIST_ID}`).html(groupOptionsHtml(currentDraft().skills));
+    input.setAttribute('list', GROUPS_LIST_ID);
+}
+
+function detachGroupSuggestions(input) {
+    input.removeAttribute('list');
+    $(`${TAB} #${GROUPS_LIST_ID}`).empty();
+}
+
+/** Updates the group suggestions of the focused group input in place (e.g. after Enter; keeps the focus). */
 function refreshGroupOptions() {
-    $(`${TAB} #rpg-pskills-ed-groups`).html(groupOptionsHtml(draft.skills));
+    if ($(`${TAB} [list="${GROUPS_LIST_ID}"]`).length === 0) return;
+    $(`${TAB} #${GROUPS_LIST_ID}`).html(groupOptionsHtml(draft.skills));
 }
 
 /** Updates the diagnostics list and the invalid mark of one threshold field in place (keeps the focus). */

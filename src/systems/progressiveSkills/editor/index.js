@@ -10,5 +10,5 @@ export { getEditorErrors } from './editor-errors.js';
 export { buildEditorLayout, syncEditorLayout } from './layout.js';
 export { skillSummaryText, skillsWithErrors } from './skill-summary.js';
 export {
-    buildEditorTabHtml, groupErrors, invalidFields, errorListHtml, diagnosticsHtml, groupOptionsHtml, skillSummaryHtml,
+    GROUPS_LIST_ID, buildEditorTabHtml, groupErrors, invalidFields, errorListHtml, diagnosticsHtml, groupOptionsHtml, skillSummaryHtml,
 } from './tab-html.js';

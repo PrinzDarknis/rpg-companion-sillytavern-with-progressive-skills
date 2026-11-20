@@ -12,7 +12,12 @@ import { diagnosticMessage, validationMessage } from './messages.js';
 import { skillSummaryText, skillsWithErrors } from './skill-summary.js';
 
 const INVALID = 'rpg-pskills-ed-invalid';
-const GROUPS_LIST_ID = 'rpg-pskills-ed-groups';
+/**
+ * Id of the group suggestion list. It is rendered empty; only the focused group input gets `list` and the options
+ * (see progressiveSkillsEditor.js). Many inputs with a permanent `list` attribute made the whole page sluggish in
+ * desktop Chrome (the hidden editor stays in the DOM after closing).
+ */
+export const GROUPS_LIST_ID = 'rpg-pskills-ed-groups';
 
 /** Validation error field → input field path (skill fields). */
 const SKILL_ERROR_FIELDS = { startXp: 'progression.startXp', threshold: 'progression.threshold' };
@@ -145,7 +150,7 @@ function skillsHtml(config, checks, errorsBySkill, invalid, addError, display, t
         : display.layout.sections.map(sectionHtml).join('') + cardsHtml(display.layout.appended);
     return `<h4><i class="fa-solid fa-graduation-cap"></i> ${escapeHtml(text('skillsTitle'))}</h4>`
         + `<p class="rpg-editor-hint">${escapeHtml(text('skillsHint'))}</p>`
-        + `<datalist id="${GROUPS_LIST_ID}">${groupOptionsHtml(config.skills)}</datalist>`
+        + `<datalist id="${GROUPS_LIST_ID}"></datalist>`
         + `<div class="rpg-pskills-ed-skills">${content}</div>`
         + '<div class="rpg-pskills-ed-add">'
         + `<input type="text" class="rpg-text-input rpg-pskills-ed-new-name" placeholder="${escapeHtml(text('newSkillPlaceholder'))}"`
@@ -184,7 +189,7 @@ function skillHtml(skill, { check, errors, invalid, open, hasErrors }, text) {
         + '<div class="rpg-pskills-ed-skill-header">'
         + textHtml({ id: `${prefix}-name`, field: 'name', value: skill.name, label: text('name'), invalid: has('name') })
         + textHtml({ id: `${prefix}-group`, field: 'group', value: skill.group, label: text('group'), invalid: false,
-            list: GROUPS_LIST_ID, placeholder: text('groupHint') })
+            autocomplete: 'off', placeholder: text('groupHint') })
         + `<span class="rpg-pskills-ed-id">${escapeHtml(text('skillId', { id }))}</span>`
         + `<button type="button" class="rpg-pskills-ed-delete" title="${escapeHtml(text('deleteSkill'))}"`
         + ` aria-label="${escapeHtml(text('deleteSkill'))}"><i class="fa-solid fa-trash"></i></button>`
@@ -235,8 +240,8 @@ function numberHtml({ id, field, value, min, label, invalid }) {
         + '</div>';
 }
 
-function textHtml({ id, field, value, label, invalid, extraClass, list, placeholder }) {
-    const extras = (list ? ` list="${escapeHtml(list)}" autocomplete="off"` : '')
+function textHtml({ id, field, value, label, invalid, extraClass, autocomplete, placeholder }) {
+    const extras = (autocomplete ? ` autocomplete="${escapeHtml(autocomplete)}"` : '')
         + (placeholder ? ` placeholder="${escapeHtml(placeholder)}"` : '');
     return '<div class="rpg-pskills-ed-field">'
         + `<label for="${escapeHtml(id)}">${escapeHtml(label)}</label>`
