@@ -6,8 +6,9 @@
  *   includeDescriptionsInContext: also send skill descriptions in the chat context (values are always sent)
  *   displayInOwnTab: show the dashboard section in an own "Skills" tab instead of the Status tab (display only)
  *   maxDelta: largest accepted single delta (XP, direct increase, points) per proposal; larger ones are rejected
- *   Skill = { id, name, description, startValue, maximumValue, growthCondition,
+ *   Skill = { id, name, description, startValue, maximumValue, growthCondition, group,
  *             progression: { enabled, startXp, threshold } }
+ *   group: optional group name (display only: dashboard sections and editor sorting, never sent to the AI)
  *   freeSkillPoints = { enabled, start, max (number | null), growthCondition }
  *
  * `threshold` is always stored as a string (a fixed number like "12" or a formula like "10 + floor(skill / 5)").
@@ -82,6 +83,7 @@ function normalizeSkill(raw, usedIds) {
         startValue: pick(raw.startValue, 'number', SKILL_DEFAULTS.startValue),
         maximumValue: pick(raw.maximumValue, 'number', SKILL_DEFAULTS.maximumValue),
         growthCondition: pick(raw.growthCondition, 'string', SKILL_DEFAULTS.growthCondition),
+        group: pick(raw.group, 'string', SKILL_DEFAULTS.group),
         progression: {
             enabled: pick(progression.enabled, 'boolean', SKILL_DEFAULTS.progression.enabled),
             startXp: pick(progression.startXp, 'number', SKILL_DEFAULTS.progression.startXp),

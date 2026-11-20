@@ -8,7 +8,7 @@ import { escapeHtml } from '../shared/index.js';
 import { editFormHtml, pointsFormHtml, spendFormHtml } from './forms-html.js';
 
 /**
- * @param {{skills: object[], freePoints: object|null}} model - From buildDashboardModel
+ * @param {{skills: object[], sections?: object[], freePoints: object|null}} model - From buildDashboardModel
  * @param {(name: string, params?: object) => string} text - From createTextLookup
  * @param {object} [options] - Open inline form (at most one); `error` is a result code, the other fields the entered text
  * @param {{skillId: string, error?: string|null, value?: string, xp?: string}|null} [options.editing] - Manual edit
@@ -26,11 +26,17 @@ export function buildDashboardHtml(model, text, options = {}) {
     if (model.skills.length === 0) {
         parts.push(`<div class="rpg-pskills-empty">${escapeHtml(text('empty'))}</div>`);
     } else {
-        parts.push('<div class="rpg-pskills-list">', ...model.skills.map(skill => skillHtml(skill, text, {
-            freePoints: model.freePoints,
-            editing: editing?.skillId === skill.id ? editing : null,
-            spending: spending?.skillId === skill.id ? spending : null,
-        })), '</div>');
+        const sections = model.sections ?? [{ group: null, skills: model.skills }];
+        for (const section of sections) {
+            if (section.group !== null) {
+                parts.push(`<h5 class="rpg-pskills-group-title">${escapeHtml(section.group)}</h5>`);
+            }
+            parts.push('<div class="rpg-pskills-list">', ...section.skills.map(skill => skillHtml(skill, text, {
+                freePoints: model.freePoints,
+                editing: editing?.skillId === skill.id ? editing : null,
+                spending: spending?.skillId === skill.id ? spending : null,
+            })), '</div>');
+        }
     }
     return parts.join('');
 }

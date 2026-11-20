@@ -7,23 +7,35 @@
  *
  * Threshold formulas are validated once for all skills when the tab is rendered on editor open; afterwards only the
  * edited skill's threshold is re-validated (on input, and when its maximum value changes).
+ *
+ * Skill cards are collapsible and arranged by group. The arrangement (layout) is built only when the tab is rendered
+ * on editor open; while editing it stays frozen (no card moves), new skills are appended expanded at the bottom.
+ * The open/closed state of cards and group sections is read from the DOM before every redraw, so redraws keep it.
  */
 import { i18n } from '../../core/i18n.js';
 import { extensionSettings } from '../../core/state.js';
 import { normalizeConfig } from '../progressiveSkills/model/index.js';
 import {
-    addSkill, buildEditorTabHtml, checkAllThresholds, checkThreshold, createEditorTextLookup, diagnosticsHtml,
-    errorListHtml, getEditorErrors, getSaveBlockers, groupErrors, invalidFields, removeSkill, setConfigField,
+    addSkill, buildEditorLayout, buildEditorTabHtml, checkAllThresholds, checkThreshold, createEditorTextLookup,
+    diagnosticsHtml, errorListHtml, getEditorErrors, getSaveBlockers, groupErrors, groupOptionsHtml, invalidFields,
+    removeSkill, setConfigField, skillSummaryHtml, skillsWithErrors, syncEditorLayout,
 } from '../progressiveSkills/editor/index.js';
 
 const TAB = '#rpg-editor-tab-progressiveSkills';
 const INVALID = 'rpg-pskills-ed-invalid';
+const HAS_ERRORS = 'rpg-pskills-ed-has-errors';
+const CARD = '.rpg-pskills-ed-skill';
+const GROUP = '.rpg-pskills-ed-group';
 /** Fields whose change re-renders the tab (they show or hide other fields). */
 const REDRAW_FIELDS = new Set(['progression.enabled', 'freeSkillPoints.enabled']);
 
 let draft = null;
 let checks = {};
 let addError = null;
+/** Display state of the current editor session (see the module comment). */
+let layout = null;
+const openSkills = new Set();
+const closedGroups = new Set();
 
 const text = () => createEditorTextLookup(key => i18n.getTranslation(key));
 
@@ -35,7 +47,8 @@ export function renderProgressiveSkillsTab() {
     draft = normalizeConfig(extensionSettings.trackerConfig?.progressiveSkills);
     checks = checkAllThresholds(draft);
     addError = null;
-    redraw();
+    resetDisplayState();
+    render();
 }
 
 /** Registers the delegated event handlers once (called by initTrackerEditor). */
@@ -56,9 +69,10 @@ export function initProgressiveSkillsTab() {
             }
         })
         .on('click.pskillsEditor', `${TAB} .rpg-pskills-ed-delete`, function () {
-            const skillId = $(this).closest('.rpg-pskills-ed-skill').attr('data-skill-id');
+            const skillId = $(this).closest(CARD).attr('data-skill-id');
             if (removeSkill(currentDraft(), skillId)) {
                 delete checks[skillId];
+                openSkills.delete(skillId);
                 commit();
                 redraw();
             }
@@ -74,6 +88,7 @@ export function canSaveProgressiveSkills() {
     const config = currentDraft();
     const result = getSaveBlockers(config, checks);
     if (!result.blocked) return true;
+    expandSkills([...result.errors.map(error => error.skillId).filter(id => id !== undefined), ...result.fatalThresholds]);
     $('.rpg-editor-tab[data-tab="progressiveSkills"]').trigger('click');
     toastr.error(text()('saveBlocked'));
     return false;
@@ -83,6 +98,7 @@ function currentDraft() {
     if (!draft) {
         draft = normalizeConfig(extensionSettings.trackerConfig?.progressiveSkills);
         checks = checkAllThresholds(draft);
+        resetDisplayState();
     }
     return draft;
 }
@@ -94,7 +110,7 @@ function commit() {
 
 function onFieldChange(element) {
     const field = element.dataset.pskillsField;
-    const skillId = $(element).closest('.rpg-pskills-ed-skill').attr('data-skill-id');
+    const skillId = $(element).closest(CARD).attr('data-skill-id');
     const raw = element.type === 'checkbox' ? element.checked : element.value;
     if (!setConfigField(currentDraft(), { skillId, field, raw })) return;
     commit();
@@ -103,6 +119,8 @@ function onFieldChange(element) {
         redraw();
         return;
     }
+    if (field === 'name') refreshSummary(skillId);
+    if (field === 'group') refreshGroupOptions();
     if (skillId !== undefined && (field === 'progression.threshold' || field === 'maximumValue')) {
         const skill = draft.skills.find(s => s.id === skillId);
         checks[skillId] = checkThreshold(skill);
@@ -121,20 +139,72 @@ function onAddSkill() {
     }
     addError = null;
     checks[result.skill.id] = checkThreshold(result.skill);
+    openSkills.add(result.skill.id);
     commit();
     redraw();
-    $(`${TAB} .rpg-pskills-ed-skill[data-skill-id="${result.skill.id}"] [data-pskills-field="name"]`).trigger('focus');
+    findCard(result.skill.id).find('[data-pskills-field="name"]').trigger('focus');
 }
 
+/** New editor session: layout sorted by group, all cards collapsed, all group sections expanded. */
+function resetDisplayState() {
+    layout = buildEditorLayout(draft.skills);
+    openSkills.clear();
+    closedGroups.clear();
+}
+
+/** Re-renders the tab and keeps the layout and the open/closed state of the current session. */
 function redraw() {
+    captureOpenState();
+    render();
+}
+
+function render() {
     const config = currentDraft();
+    layout = syncEditorLayout(layout ?? buildEditorLayout(config.skills), config.skills);
     const errors = getEditorErrors(config);
-    $(TAB).html(buildEditorTabHtml({ config, checks, errors, addError }, text()));
+    $(TAB).html(buildEditorTabHtml({ config, checks, errors, addError, layout, openSkills, closedGroups }, text()));
+}
+
+/** Reads which cards and group sections the user expanded or collapsed (before the DOM is replaced). */
+function captureOpenState() {
+    $(`${TAB} ${CARD}`).each((_, card) => {
+        if (card.open) openSkills.add(card.dataset.skillId);
+        else openSkills.delete(card.dataset.skillId);
+    });
+    $(`${TAB} ${GROUP}`).each((_, section) => {
+        if (section.open) closedGroups.delete(section.dataset.group);
+        else closedGroups.add(section.dataset.group);
+    });
+}
+
+/** Expands the given skill cards and their group sections (save guard). */
+function expandSkills(skillIds) {
+    for (const skillId of new Set(skillIds)) {
+        const $card = findCard(skillId);
+        $card.prop('open', true);
+        $card.closest(GROUP).prop('open', true);
+        openSkills.add(skillId);
+    }
+}
+
+function findCard(skillId) {
+    return $(`${TAB} ${CARD}`).filter((_, el) => el.dataset.skillId === skillId);
+}
+
+/** Updates the summary line (name, + XP) of one card in place. */
+function refreshSummary(skillId) {
+    const skill = draft.skills.find(s => s.id === skillId);
+    if (skill) findCard(skillId).children('summary').html(skillSummaryHtml(skill, text()));
+}
+
+/** Updates the group suggestions in place (keeps the focus and the layout). */
+function refreshGroupOptions() {
+    $(`${TAB} #rpg-pskills-ed-groups`).html(groupOptionsHtml(draft.skills));
 }
 
 /** Updates the diagnostics list and the invalid mark of one threshold field in place (keeps the focus). */
 function refreshThreshold(skill) {
-    const $card = $(`${TAB} .rpg-pskills-ed-skill`).filter((_, el) => el.dataset.skillId === skill.id);
+    const $card = findCard(skill.id);
     const check = checks[skill.id];
     const shown = skill.progression.enabled ? check : null;
     $card.find('.rpg-pskills-ed-diagnostics').html(diagnosticsHtml(shown, text()));
@@ -151,11 +221,13 @@ function refreshErrors() {
 
     $(`${TAB} [data-pskills-errors="general"]`).html(errorListHtml(groups.general, t));
     $(`${TAB} [data-pskills-errors="freePoints"]`).html(errorListHtml(groups.freePoints, t));
-    $(`${TAB} .rpg-pskills-ed-skill`).each((_, card) => {
+    const withErrors = skillsWithErrors(draft, checks, errors);
+    $(`${TAB} ${CARD}`).each((_, card) => {
         $(card).find('[data-pskills-errors="skill"]').html(errorListHtml(groups.skills[card.dataset.skillId] ?? [], t));
+        $(card).toggleClass(HAS_ERRORS, withErrors.has(card.dataset.skillId));
     });
     $(`${TAB} [data-pskills-field]`).not('[data-pskills-field="progression.threshold"]').each((_, input) => {
-        const skillId = $(input).closest('.rpg-pskills-ed-skill').attr('data-skill-id') ?? '';
+        const skillId = $(input).closest(CARD).attr('data-skill-id') ?? '';
         const isInvalid = invalid.has(`${skillId}|${input.dataset.pskillsField}`);
         $(input).toggleClass(INVALID, isInvalid).attr('aria-invalid', isInvalid ? 'true' : null);
     });

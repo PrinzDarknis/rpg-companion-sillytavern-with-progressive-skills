@@ -3,17 +3,22 @@
  *
  * Turns configuration + displayed state into plain numbers and flags, so the HTML builder needs no logic.
  */
+import { groupSkills, skillGroup } from '../model/index.js';
 import { evaluateThreshold } from '../progression/index.js';
 
 /**
  * @param {object} config - Normalized, enabled configuration
  * @param {object} state - Displayed state (aligned with the configuration)
- * @returns {{skills: object[], freePoints: {available: number, max: number|null}|null}}
- *   `freePoints` is null when Free Skill Points are disabled
+ * @returns {{skills: object[], sections: {group: string|null, skills: object[]}[],
+ *   freePoints: {available: number, max: number|null}|null}}
+ *   `sections`: the skills by group (ungrouped first, see groupSkills); `freePoints` is null when Free Skill Points
+ *   are disabled
  */
 export function buildDashboardModel(config, state) {
+    const skills = config.skills.map(skill => buildSkill(skill, state.skills[skill.id]));
     return {
-        skills: config.skills.map(skill => buildSkill(skill, state.skills[skill.id])),
+        skills,
+        sections: groupSkills(skills),
         freePoints: config.freeSkillPoints.enabled
             ? { available: state.freePoints, max: config.freeSkillPoints.max }
             : null,
@@ -32,6 +37,7 @@ function buildSkill(skill, entry) {
         id: skill.id,
         name: skill.name,
         description: skill.description,
+        group: skillGroup(skill),
         value,
         maximum,
         maxed,

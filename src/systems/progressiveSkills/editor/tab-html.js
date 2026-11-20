@@ -2,29 +2,52 @@
  * Progressive Skills — HTML of the "Progressive Skills" tab in the tracker editor (spec §5).
  *
  * Inputs carry `data-pskills-field` (field path) and, inside a skill card, the card carries `data-skill-id`.
+ * Skill cards are collapsible `<details>`, arranged by the editor layout (group sections, see layout.js).
  * Everything inserted is escaped.
  */
+import { collectGroups } from '../model/index.js';
 import { escapeHtml } from '../shared/index.js';
+import { buildEditorLayout, syncEditorLayout } from './layout.js';
 import { diagnosticMessage, validationMessage } from './messages.js';
+import { skillSummaryText, skillsWithErrors } from './skill-summary.js';
 
 const INVALID = 'rpg-pskills-ed-invalid';
+const GROUPS_LIST_ID = 'rpg-pskills-ed-groups';
 
 /** Validation error field → input field path (skill fields). */
 const SKILL_ERROR_FIELDS = { startXp: 'progression.startXp', threshold: 'progression.threshold' };
 
 /**
- * @param {{config: object, checks: Record<string, object>, errors: object[], addError?: string|null}} view
+ * @param {object} view
+ * @param {object} view.config - Draft configuration
+ * @param {Record<string, object>} view.checks - checkThreshold results by skill id
+ * @param {object[]} view.errors - From getEditorErrors
+ * @param {string|null} [view.addError] - Result code of the last refused add
+ * @param {object} [view.layout] - From buildEditorLayout (default: built from the config)
+ * @param {Set<string>} [view.openSkills] - Ids of expanded skill cards (default: all collapsed)
+ * @param {Set<string>} [view.closedGroups] - Names of collapsed group sections (default: all expanded)
  * @param {Function} text - From createEditorTextLookup
  */
 export function buildEditorTabHtml(view, text) {
     const { config, checks, errors } = view;
     const groups = groupErrors(errors);
     const invalid = invalidFields(errors);
+    const display = {
+        layout: syncEditorLayout(view.layout ?? buildEditorLayout(config.skills), config.skills),
+        openSkills: view.openSkills ?? new Set(),
+        closedGroups: view.closedGroups ?? new Set(),
+        withErrors: skillsWithErrors(config, checks, errors),
+    };
     return '<div class="rpg-editor-section rpg-pskills-editor">'
         + generalHtml(config, groups.general, invalid, text)
         + freePointsHtml(config.freeSkillPoints, groups.freePoints, invalid, text)
-        + skillsHtml(config, checks, groups.skills, invalid, view.addError ?? null, text)
+        + skillsHtml(config, checks, groups.skills, invalid, view.addError ?? null, display, text)
         + '</div>';
+}
+
+/** `<option>`s of the group suggestions (datalist), from the groups of all skills. */
+export function groupOptionsHtml(skills) {
+    return collectGroups(skills).map(group => `<option value="${escapeHtml(group)}"></option>`).join('');
 }
 
 /**
@@ -105,13 +128,25 @@ function freePointsHtml(points, errors, invalid, text) {
         + `<ul class="rpg-pskills-ed-errors" data-pskills-errors="freePoints">${errorListHtml(errors, text)}</ul>`;
 }
 
-function skillsHtml(config, checks, errorsBySkill, invalid, addError, text) {
-    const cards = config.skills.length === 0
+function skillsHtml(config, checks, errorsBySkill, invalid, addError, display, text) {
+    const byId = new Map(config.skills.map(skill => [skill.id, skill]));
+    const cardsHtml = ids => ids.map(id => byId.get(id)).map(skill => skillHtml(skill, {
+        check: checks[skill.id],
+        errors: errorsBySkill[skill.id] ?? [],
+        invalid,
+        open: display.openSkills.has(skill.id),
+        hasErrors: display.withErrors.has(skill.id),
+    }, text)).join('');
+    const sectionHtml = section => (section.group === null
+        ? cardsHtml(section.skillIds)
+        : groupSectionHtml(section, !display.closedGroups.has(section.group), cardsHtml(section.skillIds)));
+    const content = config.skills.length === 0
         ? `<p class="rpg-pskills-ed-empty">${escapeHtml(text('noSkills'))}</p>`
-        : config.skills.map(skill => skillHtml(skill, checks[skill.id], errorsBySkill[skill.id] ?? [], invalid, text)).join('');
+        : display.layout.sections.map(sectionHtml).join('') + cardsHtml(display.layout.appended);
     return `<h4><i class="fa-solid fa-graduation-cap"></i> ${escapeHtml(text('skillsTitle'))}</h4>`
         + `<p class="rpg-editor-hint">${escapeHtml(text('skillsHint'))}</p>`
-        + `<div class="rpg-pskills-ed-skills">${cards}</div>`
+        + `<datalist id="${GROUPS_LIST_ID}">${groupOptionsHtml(config.skills)}</datalist>`
+        + `<div class="rpg-pskills-ed-skills">${content}</div>`
         + '<div class="rpg-pskills-ed-add">'
         + `<input type="text" class="rpg-text-input rpg-pskills-ed-new-name" placeholder="${escapeHtml(text('newSkillPlaceholder'))}"`
         + ` aria-label="${escapeHtml(text('newSkillPlaceholder'))}">`
@@ -120,15 +155,36 @@ function skillsHtml(config, checks, errorsBySkill, invalid, addError, text) {
         + `<ul class="rpg-pskills-ed-errors" data-pskills-errors="add">${addError ? errorListHtml([{ code: addError }], text) : ''}</ul>`;
 }
 
-function skillHtml(skill, check, errors, invalid, text) {
+/** A group section: collapsible, empty sections are never rendered (the layout keeps them until the next open). */
+function groupSectionHtml(section, open, cards) {
+    if (cards === '') return '';
+    return `<details class="rpg-pskills-ed-group" data-group="${escapeHtml(section.group)}"${open ? ' open' : ''}>`
+        + `<summary class="rpg-pskills-ed-group-summary">${escapeHtml(section.group)}</summary>`
+        + `<div class="rpg-pskills-ed-group-skills">${cards}</div>`
+        + '</details>';
+}
+
+/** Summary line of a skill card: name (+ XP) and an error mark shown while the card has errors (CSS). */
+export function skillSummaryHtml(skill, text) {
+    return `<span class="rpg-pskills-ed-summary-text">${escapeHtml(skillSummaryText(skill, text))}</span>`
+        + `<i class="fa-solid fa-triangle-exclamation rpg-pskills-ed-summary-error" title="${escapeHtml(text('skillHasErrors'))}"`
+        + ` aria-label="${escapeHtml(text('skillHasErrors'))}"></i>`;
+}
+
+function skillHtml(skill, { check, errors, invalid, open, hasErrors }, text) {
     const id = skill.id;
     const prefix = `rpg-pskills-ed-${id}`;
     const has = field => invalid.has(`${id}|${field}`);
     const progression = skill.progression;
     const thresholdInvalid = progression.enabled && check && !check.valid;
-    return `<div class="rpg-pskills-ed-skill" data-skill-id="${escapeHtml(id)}">`
+    const classes = `rpg-pskills-ed-skill${hasErrors ? ' rpg-pskills-ed-has-errors' : ''}`;
+    return `<details class="${classes}" data-skill-id="${escapeHtml(id)}"${open ? ' open' : ''}>`
+        + `<summary class="rpg-pskills-ed-skill-summary">${skillSummaryHtml(skill, text)}</summary>`
+        + '<div class="rpg-pskills-ed-skill-body">'
         + '<div class="rpg-pskills-ed-skill-header">'
         + textHtml({ id: `${prefix}-name`, field: 'name', value: skill.name, label: text('name'), invalid: has('name') })
+        + textHtml({ id: `${prefix}-group`, field: 'group', value: skill.group, label: text('group'), invalid: false,
+            list: GROUPS_LIST_ID, placeholder: text('groupHint') })
         + `<span class="rpg-pskills-ed-id">${escapeHtml(text('skillId', { id }))}</span>`
         + `<button type="button" class="rpg-pskills-ed-delete" title="${escapeHtml(text('deleteSkill'))}"`
         + ` aria-label="${escapeHtml(text('deleteSkill'))}"><i class="fa-solid fa-trash"></i></button>`
@@ -154,7 +210,8 @@ function skillHtml(skill, check, errors, invalid, text) {
         + `<ul class="rpg-pskills-ed-diagnostics">${progression.enabled ? diagnosticsHtml(check, text) : ''}</ul>`
         + '</div>'
         + `<ul class="rpg-pskills-ed-errors" data-pskills-errors="skill">${errorListHtml(errors, text)}</ul>`
-        + '</div>';
+        + '</div>'
+        + '</details>';
 }
 
 function toggleHtml(id, field, checked, label) {
@@ -178,10 +235,12 @@ function numberHtml({ id, field, value, min, label, invalid }) {
         + '</div>';
 }
 
-function textHtml({ id, field, value, label, invalid, extraClass }) {
+function textHtml({ id, field, value, label, invalid, extraClass, list, placeholder }) {
+    const extras = (list ? ` list="${escapeHtml(list)}" autocomplete="off"` : '')
+        + (placeholder ? ` placeholder="${escapeHtml(placeholder)}"` : '');
     return '<div class="rpg-pskills-ed-field">'
         + `<label for="${escapeHtml(id)}">${escapeHtml(label)}</label>`
-        + `<input type="text" value="${escapeHtml(value)}" ${inputAttributes({ id, field, invalid, extraClass })}>`
+        + `<input type="text" value="${escapeHtml(value)}"${extras} ${inputAttributes({ id, field, invalid, extraClass })}>`
         + '</div>';
 }
 

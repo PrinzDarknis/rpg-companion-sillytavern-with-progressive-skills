@@ -12000,6 +12000,20 @@ body.documentstyle .rpg-inline-thoughts {
     gap: 0.375em;
 }
 
+.rpg-pskills-group-title {
+    margin: 0.25em 0 0;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--rpg-text);
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.rpg-pskills-list + .rpg-pskills-group-title {
+    margin-top: 0.625em;
+}
+
 .rpg-pskills-skill {
     display: flex;
     flex-direction: column;
@@ -12250,16 +12264,59 @@ body.documentstyle .rpg-inline-thoughts {
 }
 
 .rpg-pskills-ed-skill {
-    padding: 0.75em;
+    padding: 0.5em 0.75em;
     background: var(--rpg-accent);
     border: 1px solid var(--rpg-border);
     border-radius: 0.375em;
 }
 
+.rpg-pskills-ed-skill.rpg-pskills-ed-has-errors {
+    border-color: var(--rpg-highlight);
+}
+
+.rpg-pskills-ed-skill-summary,
+.rpg-pskills-ed-group-summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--rpg-text);
+}
+
+.rpg-pskills-ed-skill[open] > .rpg-pskills-ed-skill-summary {
+    margin-bottom: 0.25em;
+}
+
+.rpg-pskills-ed-summary-error {
+    display: none;
+    margin-left: 0.5em;
+    color: var(--rpg-highlight);
+}
+
+.rpg-pskills-ed-has-errors > .rpg-pskills-ed-skill-summary .rpg-pskills-ed-summary-error {
+    display: inline-block;
+}
+
+.rpg-pskills-ed-group {
+    padding: 0.5em 0.75em;
+    border: 1px dashed var(--rpg-border);
+    border-radius: 0.375em;
+}
+
+.rpg-pskills-ed-group-skills {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    margin-top: 0.5em;
+}
+
 .rpg-pskills-ed-skill-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-end;
     gap: 0.5em;
+}
+
+.rpg-pskills-ed-skill-header .rpg-pskills-ed-field {
+    flex: 1 1 8em;
 }
 
 .rpg-pskills-ed-id {

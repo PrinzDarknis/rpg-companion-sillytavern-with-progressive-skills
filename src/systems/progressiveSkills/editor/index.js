@@ -7,4 +7,8 @@ export { validationMessage, diagnosticMessage } from './messages.js';
 export { SKILL_FIELDS, CONFIG_FIELDS, addSkill, removeSkill, setConfigField } from './config-edits.js';
 export { getSaveBlockers, checkAllThresholds } from './save-check.js';
 export { getEditorErrors } from './editor-errors.js';
-export { buildEditorTabHtml, groupErrors, invalidFields, errorListHtml, diagnosticsHtml } from './tab-html.js';
+export { buildEditorLayout, syncEditorLayout } from './layout.js';
+export { skillSummaryText, skillsWithErrors } from './skill-summary.js';
+export {
+    buildEditorTabHtml, groupErrors, invalidFields, errorListHtml, diagnosticsHtml, groupOptionsHtml, skillSummaryHtml,
+} from './tab-html.js';

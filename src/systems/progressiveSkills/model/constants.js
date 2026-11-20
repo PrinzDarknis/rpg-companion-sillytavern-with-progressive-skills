@@ -15,6 +15,7 @@ export const SKILL_DEFAULTS = Object.freeze({
     startValue: 0,
     maximumValue: 100,
     growthCondition: '',
+    group: '',
     progression: Object.freeze({
         enabled: true,
         startXp: 0,

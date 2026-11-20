@@ -14,6 +14,7 @@ export const SKILL_FIELDS = Object.freeze({
     startValue: 'integer',
     maximumValue: 'integer',
     growthCondition: 'text',
+    group: 'trimmedText',
     'progression.enabled': 'boolean',
     'progression.startXp': 'integer',
     'progression.threshold': 'text',
@@ -72,6 +73,7 @@ function parseValue(type, raw) {
     switch (type) {
         case 'boolean': return raw === true || raw === 'true';
         case 'integer': return parseInteger(raw);
+        case 'trimmedText': return String(raw ?? '').trim();
         case 'optionalInteger': return String(raw ?? '').trim() === '' ? null : parseInteger(raw);
         default: return String(raw ?? '');
     }
